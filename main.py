@@ -22,6 +22,10 @@ def main():
     # Calculate and display average price
     dd.calculate_and_display_average_price(stock_data)
 
+    # notify_if_strong_fluctuations
+    threshold = 10 # change your num
+    dd.notify_if_strong_fluctuations(stock_data, threshold)
+
 
 if __name__ == "__main__":
     main()
