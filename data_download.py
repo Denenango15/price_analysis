@@ -1,6 +1,5 @@
 import yfinance as yf
 
-
 def fetch_stock_data(ticker, period='1mo'):
     """
         Функция для загрузки данных о биржевых запасах.
@@ -11,87 +10,81 @@ def fetch_stock_data(ticker, period='1mo'):
 
         Возвращает:
             pd.DataFrame: DataFrame с данными о биржевых запасах.
-
-        Function for downloading stock data.
-
-        Parameters:
-            ticker (str): The ticker of the promotion.
-            period (str, optional): The time period for uploading data (by default, '1mo' is one month).
-
-        Returns:
-            pd.DataFrame: DataFrame with stock data.
-     """
+        """
     stock = yf.Ticker(ticker)
     data = stock.history(period=period)
     return data
 
-
 def add_moving_average(data, window_size=5):
     """
-        Функция для добавления скользящей средней к данным о биржевых акциях.
+        Функция для добавления скользящего среднего к данным.
 
         Параметры:
-            data (pd.DataFrame): DataFrame с данными о биржевых акциях.
-            window_size (int, опционально): Размер окна для вычисления скользящей средней (по умолчанию 5).
+            data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+            window_size (int, опционально): Размер окна для скользящего среднего (по умолчанию 5).
 
         Возвращает:
-            pd.DataFrame: DataFrame с добавленным столбцом скользящей средней.
-
-        A function for adding a moving average to stock market data.
-
-        Parameters:
-            data (pd.DataFrame): A DataFrame with stock data.
-            window_size (int, optional): The size of the window for calculating the moving average (default is 5).
-
-        Returns:
-            pd.DataFrame: DataFrame with the added moving average column.
-    """
+            pd.DataFrame: DataFrame с добавленным скользящим средним.
+        """
     data['Moving_Average'] = data['Close'].rolling(window=window_size).mean()
     return data
 
+def calculate_rsi(data, window=14):
+    """
+        Функция для вычисления индикатора RSI (индекс относительной силы).
+
+        Параметры:
+            data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+            window (int, опционально): Размер окна для вычисления RSI (по умолчанию 14).
+
+        Возвращает:
+            pd.Series: Столбец с значениями индикатора RSI.
+        """
+    delta = data['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+def calculate_macd(data, short_window=12, long_window=26, signal_window=9):
+    """
+        Функция для вычисления индикатора MACD (скользящее среднее сходимости/расхождения).
+
+        Параметры:
+            data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+            short_window (int, опционально): Короткий период окна для вычисления EMA (по умолчанию 12).
+            long_window (int, опционально): Длинный период окна для вычисления EMA (по умолчанию 26).
+            signal_window (int, опционально): Период окна для вычисления сигнальной линии (по умолчанию 9).
+
+        Возвращает:
+            pd.Series, pd.Series: Столбцы с значениями MACD и сигнальной линии.
+        """
+    short_ema = data['Close'].ewm(span=short_window, min_periods=1, adjust=False).mean()
+    long_ema = data['Close'].ewm(span=long_window, min_periods=1, adjust=False).mean()
+    macd_line = short_ema - long_ema
+    signal_line = macd_line.ewm(span=signal_window, min_periods=1, adjust=False).mean()
+    return macd_line, signal_line
 
 def calculate_and_display_average_price(data):
     """
-        Функция для вычисления и отображения средней цены закрытия акций.
+       Функция для вычисления и отображения средней цены закрытия акций.
 
-        Параметры:
-            data (pd.DataFrame): DataFrame с данными о биржевых акциях.
-
-        Возвращает:
-            None
-
-        A function for calculating and displaying the average closing price of a stock.
-
-        Parameters:
-            data (pd.DataFrame): A DataFrame with stock data.
-
-        Returns:
-            None
-    """
+       Параметры:
+           data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+       """
     average_price = data['Close'].mean()
     print(f"Средняя цена закрытия акций: {average_price}")
 
-
 def notify_if_strong_fluctuations(data, threshold):
     """
-        Функция для определения сильных колебаний цены акций и вывода уведомления.
+        Функция для уведомления о сильных колебаниях цены акций.
 
         Параметры:
-            data (pd.DataFrame): DataFrame с данными о биржевых акциях.
-            threshold (float): Пороговое значение в процентах для определения сильных колебаний.
+            data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+            threshold (int): Пороговое значение процентных колебаний.
 
-        Возвращает:
-            None
-
-        A function for detecting strong fluctuations in the share price and displaying a notification.
-
-        Parameters:
-            data (pd.DataFrame): A DataFrame with stock data.
-            threshold (float): The threshold value in percentages for determining strong fluctuations.
-
-        Returns:
-            None
-    """
+        """
     max_price = data['Close'].max()
     min_price = data['Close'].min()
     range_price = max_price - min_price
@@ -104,22 +97,12 @@ def notify_if_strong_fluctuations(data, threshold):
 
 def export_data_to_csv(data, filename):
     """
-    Функция для экспорта данных о биржевых акциях в CSV файл.
+        Функция для экспорта данных в формат CSV.
 
-    Параметры:
-        data (pd.DataFrame): DataFrame с данными о биржевых акциях.
-        filename (str): Имя файла для сохранения данных.
+        Параметры:
+            data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+            filename (str): Имя файла для сохранения.
 
-    Возвращает:
-        None
-    Function for exporting stock data to a CSV file.
-
-     Parameters:
-        data (pd.DataFrame): A DataFrame with stock data.
-        filename (str): The name of the file to save the data.
-
-     Returns:
-        None
-    """
+        """
     data.to_csv(filename, index=False)
     print(f"Создан файл с данными: {filename}")

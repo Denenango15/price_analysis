@@ -1,13 +1,11 @@
 import data_download as dd
 import data_plotting as dplt
 
-
-
 def main():
     """
-       Основная функция для получения данных о биржевых акциях, построения графика и анализа колебаний цен.
-       The main function is to obtain data on stock exchanges, plotting and analyzing price fluctuations.
-    """
+           Основная функция для получения данных о биржевых акциях, построения графика и анализа колебаний цен.
+           The main function is to obtain data on stock exchanges, plotting and analyzing price fluctuations.
+        """
     print("Добро пожаловать в инструмент получения и построения графиков биржевых данных.")
     print(
         "Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
@@ -17,24 +15,24 @@ def main():
     ticker = input("Введите тикер акции (например, «AAPL» для Apple Inc):»")
     period = input("Введите период для данных (например, '1mo' для одного месяца): ")
 
-    # Fetch stock data / Получение данных
+    # Fetch stock data
     stock_data = dd.fetch_stock_data(ticker, period)
 
-    # Add moving average to the data / Добавление скользящих средних
+    # Add moving average to the data
     stock_data = dd.add_moving_average(stock_data)
 
-    # Plot the data / Построение графика
-    dplt.create_and_save_plot(stock_data, ticker, period)
+    # Plot the data, RSI and MACD
+    dplt.create_and_save_plots(stock_data, ticker, period)
 
-    # Calculate and display average price / Рассчет и отображение средней цены
+    # Calculate and display average price
     dd.calculate_and_display_average_price(stock_data)
 
-    # notify_if_strong_fluctuations / Вызов функции для оповещения о сильных колебаниях
-    threshold = 10  # change your num
+    # Notify if strong fluctuations
+    threshold = 10
     dd.notify_if_strong_fluctuations(stock_data, threshold)
 
-    # export data to csv / сохранение файла в csv
-    filename = "Your_file_name.csv"
+    # Export data to csv
+    filename = f"{ticker}_{period}_stock_data.csv"
     dd.export_data_to_csv(stock_data, filename)
 
 if __name__ == "__main__":
