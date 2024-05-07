@@ -14,8 +14,8 @@ def fetch_stock_data(ticker, start_date=None, end_date=None, period='1mo'):
     Возвращает:
         pd.DataFrame: DataFrame с данными о биржевых запасах.
     """
-    if start_date is not None and end_date is not None:
-        data = yf.download(ticker, start=start_date, end=end_date, progress=False) # progress = True if your need notification about progress
+    if start_date and end_date:
+        data = yf.download(ticker, start=start_date, end=end_date, progress=False)
     else:
         stock = yf.Ticker(ticker)
         data = stock.history(period=period)

@@ -3,7 +3,7 @@ import pandas as pd
 from data_download import calculate_rsi, calculate_macd
 
 
-def create_and_save_plot(data, ticker, period, filename=None):
+def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
     """
         Функция для создания и сохранения графика цены акций с течением времени.
 
@@ -12,6 +12,7 @@ def create_and_save_plot(data, ticker, period, filename=None):
             ticker (str): Тикер акции.
             period (str): Период времени для данных.
             filename (str, опционально): Имя файла для сохранения графика (по умолчанию None).
+            style (str, опционально): Стиль оформления графика (по умолчанию 'ggplot').
 
         """
     plt.figure(figsize=(10, 6))
@@ -33,6 +34,7 @@ def create_and_save_plot(data, ticker, period, filename=None):
     plt.title(f"{ticker} Цена акций с течением времени")
     plt.xlabel("Дата")
     plt.ylabel("Цена")
+    plt.style.use(style)  # Применение выбранного стиля
     plt.legend()
 
     if filename is None:
