@@ -86,6 +86,20 @@ def calculate_and_display_average_price(data):
     average_price = data['Close'].mean()
     print(f"Средняя цена закрытия акций: {average_price}")
 
+def calculate_standard_deviation(data, window=5):
+    """
+    Функция для вычисления стандартного отклонения цены закрытия.
+
+    Параметры:
+        data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+        window (int, опционально): Размер окна для вычисления стандартного отклонения (по умолчанию 5).
+
+    Возвращает:
+        pd.Series: Столбец со значениями стандартного отклонения цены закрытия.
+    """
+    std_dev = data['Close'].rolling(window=window).std()
+    return std_dev
+
 
 def notify_if_strong_fluctuations(data, threshold):
     """

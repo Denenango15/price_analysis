@@ -5,16 +5,16 @@ from data_download import calculate_rsi, calculate_macd
 
 def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
     """
-        Функция для создания и сохранения графика цены акций с течением времени.
+    Функция для создания и сохранения графика цены акций с течением времени.
 
-        Параметры:
-            data (pd.DataFrame): DataFrame с данными о биржевых запасах.
-            ticker (str): Тикер акции.
-            period (str): Период времени для данных.
-            filename (str, опционально): Имя файла для сохранения графика (по умолчанию None).
-            style (str, опционально): Стиль оформления графика (по умолчанию 'ggplot').
+    Параметры:
+        data (pd.DataFrame): DataFrame с данными о биржевых запасах.
+        ticker (str): Тикер акции.
+        period (str): Период времени для данных.
+        filename (str, опционально): Имя файла для сохранения графика (по умолчанию None).
+        style (str, опционально): Стиль оформления графика (по умолчанию 'ggplot').
 
-        """
+    """
     plt.figure(figsize=(10, 6))
 
     if 'Date' not in data:
@@ -22,6 +22,8 @@ def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
             dates = data.index.to_numpy()
             plt.plot(dates, data['Close'].values, label='Close Price')
             plt.plot(dates, data['Moving_Average'].values, label='Moving Average')
+            plt.fill_between(dates, data['Moving_Average'].values - 2 * data['Standard_Deviation'].values,
+                             data['Moving_Average'].values + 2 * data['Standard_Deviation'].values, alpha=0.2)
         else:
             print("Информация о дате отсутствует или не имеет распознаваемого формата.")
             return
@@ -30,6 +32,8 @@ def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
             data['Date'] = pd.to_datetime(data['Date'])
         plt.plot(data['Date'], data['Close'], label='Close Price')
         plt.plot(data['Date'], data['Moving_Average'], label='Moving Average')
+        plt.fill_between(data['Date'], data['Moving_Average'] - 2 * data['Standard_Deviation'],
+                         data['Moving_Average'] + 2 * data['Standard_Deviation'], alpha=0.2)
 
     plt.title(f"{ticker} Цена акций с течением времени")
     plt.xlabel("Дата")
@@ -42,6 +46,7 @@ def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
 
     plt.savefig(filename)
     print(f"График сохранен как {filename}")
+
 
 
 def plot_rsi(data, ticker, period, filename=None):
