@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from data_download import calculate_rsi, calculate_macd
+import plotly.graph_objs as go
 
 
 def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
@@ -12,40 +13,55 @@ def create_and_save_plot(data, ticker, period, filename=None, style='ggplot'):
         ticker (str): Тикер акции.
         period (str): Период времени для данных.
         filename (str, опционально): Имя файла для сохранения графика (по умолчанию None).
-        style (str, опционально): Стиль оформления графика (по умолчанию 'ggplot').
+        style (str, опционально): Стиль оформления графика (по умолчанию 'ggplot'). В интерактивном не работает
 
     """
-    plt.figure(figsize=(10, 6))
+    fig = go.Figure()
 
-    if 'Date' not in data:
-        if pd.api.types.is_datetime64_any_dtype(data.index):
-            dates = data.index.to_numpy()
-            plt.plot(dates, data['Close'].values, label='Close Price')
-            plt.plot(dates, data['Moving_Average'].values, label='Moving Average')
-            plt.fill_between(dates, data['Moving_Average'].values - 2 * data['Standard_Deviation'].values,
-                             data['Moving_Average'].values + 2 * data['Standard_Deviation'].values, alpha=0.2)
-        else:
-            print("Информация о дате отсутствует или не имеет распознаваемого формата.")
-            return
-    else:
-        if not pd.api.types.is_datetime64_any_dtype(data['Date']):
-            data['Date'] = pd.to_datetime(data['Date'])
-        plt.plot(data['Date'], data['Close'], label='Close Price')
-        plt.plot(data['Date'], data['Moving_Average'], label='Moving Average')
-        plt.fill_between(data['Date'], data['Moving_Average'] - 2 * data['Standard_Deviation'],
-                         data['Moving_Average'] + 2 * data['Standard_Deviation'], alpha=0.2)
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close Price'))
+    fig.add_trace(go.Scatter(x=data.index, y=data['Moving_Average'], mode='lines', name='Moving Average'))
 
-    plt.title(f"{ticker} Цена акций с течением времени")
-    plt.xlabel("Дата")
-    plt.ylabel("Цена")
-    plt.style.use(style)  # Применение выбранного стиля
-    plt.legend()
+    fig.update_layout(title=f"{ticker} Цена акций с течением времени", xaxis_title="Дата", yaxis_title="Цена")
 
     if filename is None:
-        filename = f"{ticker}_{period}_stock_price_chart.png"
+        filename = f"{ticker}_{period}_stock_price_chart.html"
 
-    plt.savefig(filename)
-    print(f"График сохранен как {filename}")
+    fig.write_html(filename)
+    print(f"Интерактивный график сохранен как {filename}")
+
+    '''if you don't need an interactive graph, then you need to remove the # from the code below'''
+
+    # plt.figure(figsize=(10, 6))
+    #
+    # if 'Date' not in data:
+    #     if pd.api.types.is_datetime64_any_dtype(data.index):
+    #         dates = data.index.to_numpy()
+    #         plt.plot(dates, data['Close'].values, label='Close Price')
+    #         plt.plot(dates, data['Moving_Average'].values, label='Moving Average')
+    #         plt.fill_between(dates, data['Moving_Average'].values - 2 * data['Standard_Deviation'].values,
+    #                          data['Moving_Average'].values + 2 * data['Standard_Deviation'].values, alpha=0.2)
+    #     else:
+    #         print("Информация о дате отсутствует или не имеет распознаваемого формата.")
+    #         return
+    # else:
+    #     if not pd.api.types.is_datetime64_any_dtype(data['Date']):
+    #         data['Date'] = pd.to_datetime(data['Date'])
+    #     plt.plot(data['Date'], data['Close'], label='Close Price')
+    #     plt.plot(data['Date'], data['Moving_Average'], label='Moving Average')
+    #     plt.fill_between(data['Date'], data['Moving_Average'] - 2 * data['Standard_Deviation'],
+    #                      data['Moving_Average'] + 2 * data['Standard_Deviation'], alpha=0.2)
+    #
+    # plt.title(f"{ticker} Цена акций с течением времени")
+    # plt.xlabel("Дата")
+    # plt.ylabel("Цена")
+    # plt.style.use(style)  # Применение выбранного стиля
+    # plt.legend()
+    #
+    # if filename is None:
+    #     filename = f"{ticker}_{period}_stock_price_chart.png"
+    #
+    # plt.savefig(filename)
+    # print(f"График сохранен как {filename}")
 
 
 

@@ -19,6 +19,8 @@ def fetch_stock_data(ticker, start_date=None, end_date=None, period='1mo'):
     else:
         stock = yf.Ticker(ticker)
         data = stock.history(period=period)
+
+    data.reset_index(inplace=True)  # Сброс индекса для использования даты как столбца
     return data
 
 
